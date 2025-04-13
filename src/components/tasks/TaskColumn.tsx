@@ -1,5 +1,7 @@
+'use client'
+
 import React from 'react'
-import { Droppable, Draggable } from 'react-beautiful-dnd'
+import { Droppable, Draggable } from '@hello-pangea/dnd'
 import { TaskCard } from './TaskCard'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'

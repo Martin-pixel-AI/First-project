@@ -96,15 +96,16 @@ export function TaskModal({ isOpen, onClose, task, onSubmit }: TaskModalProps) {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {watch('dueDate') ? format(watch('dueDate'), 'PPP') : 'Pick a date'}
+                  {watch('dueDate') ? format(watch('dueDate') as Date, 'PPP') : 'Pick a date'}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
                 <Calendar
                   mode="single"
-                  selected={watch('dueDate')}
-                  onSelect={(date) => setValue('dueDate', date)}
+                  selected={watch('dueDate') as Date}
+                  onSelect={(value) => setValue('dueDate', value || null)}
                   initialFocus
+                  required={false}
                 />
               </PopoverContent>
             </Popover>

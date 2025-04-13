@@ -97,8 +97,9 @@ export function TaskModal({ task, onSubmit, onClose }: TaskModalProps) {
                 <Calendar
                   mode="single"
                   selected={date || undefined}
-                  onSelect={setDate}
+                  onSelect={(value) => setDate(value || null)}
                   initialFocus
+                  required={false}
                 />
               </PopoverContent>
             </Popover>
