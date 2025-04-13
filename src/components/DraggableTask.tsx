@@ -6,9 +6,9 @@ import { Task as TaskType } from "./Project";
 interface DraggableTaskProps {
   id: string;
   task: TaskType;
-  onAddSubtask: (parentTaskId: string, subtaskTitle: string, priority: 'low' | 'medium' | 'high', importance: 'low' | 'medium' | 'high') => void;
+  onAddSubtask: (parentTaskId: string, subtaskTitle: string, subtaskDescription: string, priority: 'low' | 'medium' | 'high') => void;
   onDelete: (taskId: string) => void;
-  onEdit: (taskId: string, newTitle: string, newPriority: 'low' | 'medium' | 'high', newImportance: 'low' | 'medium' | 'high') => void;
+  onEdit: (taskId: string, newTitle: string, newDescription: string, newPriority: 'low' | 'medium' | 'high') => void;
 }
 
 export function DraggableTask({ id, task, onAddSubtask, onDelete, onEdit }: DraggableTaskProps) {
