@@ -11,24 +11,24 @@ export interface ProjectProps {
   onDelete: (id: string) => void;
   onEdit: (id: string, newName: string) => void;
   filterPriority: 'all' | 'low' | 'medium' | 'high';
-  filterImportance: 'all' | 'low' | 'medium' | 'high';
 }
 
 export interface Task {
   id: string;
   title: string;
+  description: string;
   subtasks: Task[];
   priority: 'low' | 'medium' | 'high';
-  importance: 'low' | 'medium' | 'high';
 }
 
-export function Project({ id, name, onDelete, onEdit, filterPriority, filterImportance }: ProjectProps) {
+export function Project({ id, name, onDelete, onEdit, filterPriority }: ProjectProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskDescription, setNewTaskDescription] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState<'low' | 'medium' | 'high'>('medium');
-  const [newTaskImportance, setNewTaskImportance] = useState<'low' | 'medium' | 'high'>('medium');
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(name);
+  const [editedDescription, setEditedDescription] = useState('');
 
   // Загрузка задач из localStorage при инициализации
   useEffect(() => {
@@ -48,16 +48,17 @@ export function Project({ id, name, onDelete, onEdit, filterPriority, filterImpo
       const newTask: Task = {
         id: Date.now().toString(),
         title: newTaskTitle,
+        description: newTaskDescription,
         subtasks: [],
-        priority: newTaskPriority,
-        importance: newTaskImportance
+        priority: newTaskPriority
       };
       setTasks([...tasks, newTask]);
       setNewTaskTitle('');
+      setNewTaskDescription('');
     }
   };
 
-  const addSubtask = (parentTaskId: string, subtaskTitle: string, priority: 'low' | 'medium' | 'high', importance: 'low' | 'medium' | 'high') => {
+  const addSubtask = (parentTaskId: string, subtaskTitle: string, subtaskDescription: string, priority: 'low' | 'medium' | 'high') => {
     setTasks(tasks.map(task => {
       if (task.id === parentTaskId) {
         return {
@@ -65,9 +66,9 @@ export function Project({ id, name, onDelete, onEdit, filterPriority, filterImpo
           subtasks: [...task.subtasks, {
             id: Date.now().toString(),
             title: subtaskTitle,
+            description: subtaskDescription,
             subtasks: [],
-            priority,
-            importance
+            priority
           }]
         };
       }
@@ -79,14 +80,14 @@ export function Project({ id, name, onDelete, onEdit, filterPriority, filterImpo
     setTasks(tasks.filter(task => task.id !== taskId));
   };
 
-  const editTask = (taskId: string, newTitle: string, newPriority: 'low' | 'medium' | 'high', newImportance: 'low' | 'medium' | 'high') => {
+  const editTask = (taskId: string, newTitle: string, newDescription: string, newPriority: 'low' | 'medium' | 'high') => {
     setTasks(tasks.map(task => {
       if (task.id === taskId) {
         return {
           ...task,
           title: newTitle,
-          priority: newPriority,
-          importance: newImportance
+          description: newDescription,
+          priority: newPriority
         };
       }
       return task;
@@ -100,31 +101,41 @@ export function Project({ id, name, onDelete, onEdit, filterPriority, filterImpo
 
   // Фильтрация задач
   const filteredTasks = tasks.filter(task => {
-    const matchesPriority = filterPriority === 'all' || task.priority === filterPriority;
-    const matchesImportance = filterImportance === 'all' || task.importance === filterImportance;
-    return matchesPriority && matchesImportance;
+    return filterPriority === 'all' || task.priority === filterPriority;
   });
 
   return (
     <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-200">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b">
         {isEditing ? (
-          <div className="flex space-x-2 w-full">
+          <div className="flex flex-col space-y-2 w-full">
             <Input
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleEditSubmit()}
               className="flex-1"
+              placeholder="Project name"
             />
-            <Button onClick={handleEditSubmit} className="px-4">Save</Button>
-            <Button variant="outline" onClick={() => setIsEditing(false)} className="px-4">Cancel</Button>
+            <Input
+              value={editedDescription}
+              onChange={(e) => setEditedDescription(e.target.value)}
+              className="flex-1"
+              placeholder="Project description"
+            />
+            <div className="flex space-x-2">
+              <Button onClick={handleEditSubmit} className="px-4">Save</Button>
+              <Button variant="outline" onClick={() => setIsEditing(false)} className="px-4">Cancel</Button>
+            </div>
           </div>
         ) : (
           <>
-            <CardTitle className="text-2xl font-bold tracking-tight">{name}</CardTitle>
+            <div className="space-y-1">
+              <CardTitle className="text-2xl font-bold tracking-tight">{name}</CardTitle>
+              <p className="text-sm text-gray-500">{editedDescription || "No description"}</p>
+            </div>
             <div className="flex space-x-2">
-              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="hover:bg-gray-100">Edit</Button>
-              <Button variant="destructive" size="sm" onClick={() => onDelete(id)} className="hover:bg-red-600">Delete</Button>
+              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="hover:bg-gray-100">E</Button>
+              <Button variant="destructive" size="sm" onClick={() => onDelete(id)} className="hover:bg-red-600">D</Button>
             </div>
           </>
         )}
@@ -139,19 +150,15 @@ export function Project({ id, name, onDelete, onEdit, filterPriority, filterImpo
               onKeyPress={(e) => e.key === 'Enter' && addTask()}
               className="flex-1 min-w-[200px]"
             />
+            <Input
+              placeholder="Task description..."
+              value={newTaskDescription}
+              onChange={(e) => setNewTaskDescription(e.target.value)}
+              className="flex-1 min-w-[200px]"
+            />
             <Select value={newTaskPriority} onValueChange={(value: 'low' | 'medium' | 'high') => setNewTaskPriority(value)}>
               <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={newTaskImportance} onValueChange={(value: 'low' | 'medium' | 'high') => setNewTaskImportance(value)}>
-              <SelectTrigger className="w-[130px]">
-                <SelectValue placeholder="Importance" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="low">Low</SelectItem>
