@@ -1,90 +1,63 @@
 'use client'
 
-import * as React from "react"
-import { Plus } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { TaskList } from "@/components/task-list"
-import { TaskModal } from "@/components/task-modal"
-import { Task, TaskFormData } from "@/types/task"
-
-const STORAGE_KEY = 'task-management-tasks'
+import { useState } from 'react'
+import { Project } from '@/components/Project'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
 
 export default function Home() {
-  const [tasks, setTasks] = React.useState<Task[]>(() => {
-    if (typeof window === 'undefined') return []
-    const stored = localStorage.getItem(STORAGE_KEY)
-    return stored ? JSON.parse(stored) : []
-  })
-  const [isModalOpen, setIsModalOpen] = React.useState(false)
-  const [editingTask, setEditingTask] = React.useState<Task | undefined>()
+  const [projects, setProjects] = useState<{ id: string; name: string }[]>([])
+  const [newProjectName, setNewProjectName] = useState('')
+  const { theme, setTheme } = useTheme()
 
-  React.useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
-  }, [tasks])
-
-  const handleCreateTask = (data: TaskFormData) => {
-    const newTask: Task = {
-      id: crypto.randomUUID(),
-      ...data,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+  const addProject = () => {
+    if (newProjectName.trim()) {
+      setProjects([...projects, { id: Date.now().toString(), name: newProjectName }])
+      setNewProjectName('')
     }
-    setTasks((prev) => [...prev, newTask])
-    setIsModalOpen(false)
   }
 
-  const handleEditTask = (data: TaskFormData) => {
-    if (!editingTask) return
-
-    const updatedTask: Task = {
-      ...editingTask,
-      ...data,
-      updatedAt: new Date(),
-    }
-
-    setTasks((prev) =>
-      prev.map((task) => (task.id === editingTask.id ? updatedTask : task))
-    )
-    setIsModalOpen(false)
-    setEditingTask(undefined)
-  }
-
-  const handleDeleteTask = (taskId: string) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId))
-  }
-
-  const openEditModal = (task: Task) => {
-    setEditingTask(task)
-    setIsModalOpen(true)
+  const deleteProject = (id: string) => {
+    setProjects(projects.filter(project => project.id !== id))
   }
 
   return (
-    <main className="container mx-auto p-4">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Task Management</h1>
-        <Button onClick={() => setIsModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Task
-        </Button>
+    <main className="min-h-screen p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold">Task Board</h1>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+        </div>
+
+        <div className="flex space-x-4">
+          <Input
+            placeholder="New project name..."
+            value={newProjectName}
+            onChange={(e) => setNewProjectName(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && addProject()}
+          />
+          <Button onClick={addProject}>Add Project</Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <Project
+              key={project.id}
+              id={project.id}
+              name={project.name}
+              onDelete={deleteProject}
+            />
+          ))}
+        </div>
       </div>
-
-      <TaskList
-        tasks={tasks}
-        onEditTask={openEditModal}
-        onDeleteTask={handleDeleteTask}
-      />
-
-      {isModalOpen && (
-        <TaskModal
-          task={editingTask}
-          onSubmit={editingTask ? handleEditTask : handleCreateTask}
-          onClose={() => {
-            setIsModalOpen(false)
-            setEditingTask(undefined)
-          }}
-        />
-      )}
     </main>
   )
 } 
