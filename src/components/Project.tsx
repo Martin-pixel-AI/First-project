@@ -106,39 +106,41 @@ export function Project({ id, name, onDelete, onEdit, filterPriority, filterImpo
   });
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-200">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b">
         {isEditing ? (
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 w-full">
             <Input
               value={editedName}
               onChange={(e) => setEditedName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleEditSubmit()}
+              className="flex-1"
             />
-            <Button onClick={handleEditSubmit}>Save</Button>
-            <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+            <Button onClick={handleEditSubmit} className="px-4">Save</Button>
+            <Button variant="outline" onClick={() => setIsEditing(false)} className="px-4">Cancel</Button>
           </div>
         ) : (
           <>
-            <CardTitle className="text-xl font-bold">{name}</CardTitle>
+            <CardTitle className="text-2xl font-bold tracking-tight">{name}</CardTitle>
             <div className="flex space-x-2">
-              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>Edit</Button>
-              <Button variant="destructive" size="sm" onClick={() => onDelete(id)}>Delete</Button>
+              <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="hover:bg-gray-100">Edit</Button>
+              <Button variant="destructive" size="sm" onClick={() => onDelete(id)} className="hover:bg-red-600">Delete</Button>
             </div>
           </>
         )}
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col space-y-4">
-          <div className="flex space-x-2">
+      <CardContent className="pt-6">
+        <div className="flex flex-col space-y-6">
+          <div className="flex flex-wrap gap-3 items-center bg-gray-50 p-4 rounded-lg">
             <Input
               placeholder="New task..."
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && addTask()}
+              className="flex-1 min-w-[200px]"
             />
             <Select value={newTaskPriority} onValueChange={(value: 'low' | 'medium' | 'high') => setNewTaskPriority(value)}>
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Priority" />
               </SelectTrigger>
               <SelectContent>
@@ -148,7 +150,7 @@ export function Project({ id, name, onDelete, onEdit, filterPriority, filterImpo
               </SelectContent>
             </Select>
             <Select value={newTaskImportance} onValueChange={(value: 'low' | 'medium' | 'high') => setNewTaskImportance(value)}>
-              <SelectTrigger className="w-[120px]">
+              <SelectTrigger className="w-[130px]">
                 <SelectValue placeholder="Importance" />
               </SelectTrigger>
               <SelectContent>
@@ -157,11 +159,11 @@ export function Project({ id, name, onDelete, onEdit, filterPriority, filterImpo
                 <SelectItem value="high">High</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={addTask}>Add Task</Button>
+            <Button onClick={addTask} className="px-6">Add Task</Button>
           </div>
-          <div className="flex flex-row space-x-4 overflow-x-auto pb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredTasks.map((task) => (
-              <div key={task.id} className="flex-none w-80">
+              <div key={task.id} className="w-full">
                 <Task
                   task={task}
                   onAddSubtask={addSubtask}
