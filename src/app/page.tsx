@@ -15,7 +15,6 @@ export default function Home() {
   const [newProjectName, setNewProjectName] = useState('')
   const { theme, setTheme } = useTheme()
   const [filterPriority, setFilterPriority] = useState<'all' | 'low' | 'medium' | 'high'>('all')
-  const [filterImportance, setFilterImportance] = useState<'all' | 'low' | 'medium' | 'high'>('all')
 
   // Загрузка проектов из localStorage при инициализации
   useEffect(() => {
@@ -83,17 +82,6 @@ export default function Home() {
               <SelectItem value="high">High Priority</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={filterImportance} onValueChange={(value: 'all' | 'low' | 'medium' | 'high') => setFilterImportance(value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Importance" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Importance</SelectItem>
-              <SelectItem value="low">Low Importance</SelectItem>
-              <SelectItem value="medium">Medium Importance</SelectItem>
-              <SelectItem value="high">High Importance</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <div className="grid grid-cols-1 gap-6">
@@ -105,7 +93,6 @@ export default function Home() {
               onDelete={deleteProject}
               onEdit={editProject}
               filterPriority={filterPriority}
-              filterImportance={filterImportance}
             />
           ))}
         </div>
